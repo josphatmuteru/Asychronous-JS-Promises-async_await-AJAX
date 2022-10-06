@@ -150,7 +150,6 @@ const getJSON = function (url, errMsg = 'Something went wrong') {
 // btn.addEventListener('click', function () {
 //   getCountryData('kasfkj');
 // });
-
 const getCountryData = function (country) {
   getJSON(`https://restcountries.com/v2//name/${country}`, 'Country not found')
     .then(data => {
@@ -177,6 +176,42 @@ const getCountryData = function (country) {
     });
 };
 // getCountryData('Finland');
+
+const whereAmI = function (lat, lng) {
+  var requestOptions = {
+    method: 'GET',
+  };
+  return (
+    fetch(
+      `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&apiKey=dd7cefac26ab4684b2c6f369606e2ea1`,
+      requestOptions
+    )
+      .then(response => {
+        if (response.status === 403)
+          throw new Error('Too many requests! Slow down');
+        return response.json();
+      })
+      // .then(result => console.log(result));
+      .then(result => {
+        const data = result.features[0].properties;
+        console.log(`You are in ${data.city}, ${data.country}`);
+
+        return fetch(`https://restcountries.com/v2//name/${data.country}`);
+      })
+      .then(response => {
+        if (!response.ok)
+          throw new Error(`Country not found (${response.status})`);
+        return response.json();
+      })
+      .then(data => renderCountry(data[0]))
+      .finally(() => {
+        countriesContainer.style.opacity = 1;
+      })
+      .catch(error => console.log('error', error))
+  );
+};
+
 btn.addEventListener('click', function () {
-  getCountryData('australia');
+  whereAmI(-33.933, 18.474);
+  // getCountryData('australia');
 });
