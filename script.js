@@ -215,3 +215,56 @@ btn.addEventListener('click', function () {
   whereAmI(-33.933, 18.474);
   // getCountryData('australia');
 });
+
+//Asynchronous Javascript behind the scenes
+/*
+// executed first
+console.log('Test Start');
+
+setTimeout(() => {
+  // executed last because of microtasks queu having more priority than than the callback queu in which this line will be placed
+  console.log('0 sec timer'), 0;
+});
+// executed third
+Promise.resolve('Resolved promise 1').then(res => console.log(res));
+
+// executed fourth
+Promise.resolve('Resolved promise 2').then(res => {
+  for (let i = 0; i < 100000; i++) {}
+  console.log(res);
+});
+
+//executed second
+console.log('Test end');
+*/
+
+// creating a promise from scratch
+const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log('Lottery draw is happening');
+  setTimeout(function () {
+    if (Math.random() >= 0.5) {
+      resolve('You win!');
+    } else {
+      reject(new Error('You lost your money'));
+    }
+  }, 2000);
+});
+
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+
+// Promisifying setTimeout
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(2)
+  .then(() => {
+    console.log('I waited for 2 seconds');
+    return wait(1);
+  })
+  .then(() => console.log('I waited for 1 second'));
+
+Promise.resolve('abc').then(x => console.log(x));
+Promise.reject(new Error('Problem!')).catch(x => console.error(x));
