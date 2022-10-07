@@ -211,10 +211,10 @@ const whereAmI = function (lat, lng) {
   );
 };
 
-btn.addEventListener('click', function () {
-  whereAmI(-33.933, 18.474);
-  // getCountryData('australia');
-});
+// btn.addEventListener('click', function () {
+//   whereAmI(-33.933, 18.474);
+//   // getCountryData('australia');
+// });
 
 //Asynchronous Javascript behind the scenes
 /*
@@ -237,6 +237,7 @@ Promise.resolve('Resolved promise 2').then(res => {
 //executed second
 console.log('Test end');
 */
+/*
 
 // creating a promise from scratch
 const lotteryPromise = new Promise(function (resolve, reject) {
@@ -268,3 +269,76 @@ wait(2)
 
 Promise.resolve('abc').then(x => console.log(x));
 Promise.reject(new Error('Problem!')).catch(x => console.error(x));
+*/
+
+/*
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    // naviagator.geolocation.getCurrentPosition(position => resolve(position), err => reject(err))
+
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  }).then(pos => {
+    const { latitude: lat, longitude: lng } = pos.coords;
+    console.log(pos);
+    console.log(lat, lng);
+    whereAmI(lat, lng);
+  });
+};
+// getPosition().then(pos => console.log(pos));
+
+btn.addEventListener('click', function () {
+  getPosition();
+  // whereAmI(-33.933, 18.474);
+  // getCountryData('australia');
+});
+*/
+
+/////////////// coding challenge 2 //////////////
+
+const imgContainer = document.querySelector('.images');
+// './img/img-1.jpg';
+// './img/img-2.jpg';
+
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+const errorHandler = function (errMsg) {
+  imgContainer.insertAdjacentHTML('beforeend', errMsg);
+};
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const image = document.createElement('img');
+    image.src = imgPath;
+
+    image.addEventListener('error', function () {
+      reject(new Error('Image not found'));
+    });
+
+    image.addEventListener('load', function () {
+      imgContainer.append(image);
+      resolve(image);
+    });
+  });
+};
+let currentImg = '';
+createImage('./img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    console.log('Image1 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('./img/img-2.jpg');
+  })
+  .then(img => {
+    currentImg = img;
+    console.log('Image2 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+  });
