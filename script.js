@@ -344,6 +344,8 @@ createImage('./img/img-1.jpg')
     currentImg.style.display = 'none';
   });
 */
+
+////////ASYNC AWAIT ///////////
 const getPosition = async function () {
   return new Promise(function (resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -425,6 +427,8 @@ const get3Countries = async function (c1, c2, c3) {
 };
 get3Countries('Kenya', 'Tanzania', 'Djibouti');
 */
+
+/*
 ///////// Promise.race //////////////////
 (async function () {
   const res = await Promise.race([
@@ -466,3 +470,105 @@ Promise.any([
 ])
   .then(res => console.log(res))
   .catch(err => console.log(err));
+*/
+
+////////Coding challenge 3///////
+const imgContainer = document.querySelector('.images');
+// './img/img-1.jpg';
+// './img/img-2.jpg';
+const wait = async function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+const errorHandler = function (errMsg) {
+  imgContainer.insertAdjacentHTML('beforeend', errMsg);
+};
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const image = document.createElement('img');
+    image.src = imgPath;
+
+    image.addEventListener('error', function () {
+      reject(new Error('Image not found'));
+    });
+
+    image.addEventListener('load', function () {
+      imgContainer.append(image);
+      resolve(image);
+    });
+  });
+};
+let currentImg = '';
+createImage('./img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    console.log('Image1 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('./img/img-2.jpg');
+  })
+  .then(img => {
+    currentImg = img;
+    console.log('Image2 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+  });
+
+const loadNPause = async function () {
+  try {
+    let img = await createImage('./img/img-1.jpg');
+    console.log('Image 1 loaded');
+    await wait(2);
+
+    img.style.display = 'none';
+    img = await createImage('./img/img-2.jpg');
+    await wait(2);
+
+    img.style.display = 'none';
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
+// loadNPause();
+
+const loadAll = async function (imgArr) {
+  try {
+    const imgs = imgArr.map(async img => await createImage(img));
+    const imgsEl = await Promise.all(imgs);
+    console.log(imgsEl);
+    imgsEl.forEach(img => {
+      img.classList.add('parallel');
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
+
+// let currentImg = '';
+// createImage('./img/img-1.jpg')
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image1 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//     return createImage('./img/img-2.jpg');
+//   })
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image2 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//   });
